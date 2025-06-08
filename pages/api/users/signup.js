@@ -1,5 +1,5 @@
-import { hashPassword } from "@/utils/auth";
-import prisma from "@utils/db";
+import { hashPassword } from "/utils/auth";
+import prisma from "/utils/db";
 export default async function handler(req, res) {
 	if (req.method !== "POST") {
 		return res.status(405).json({ error: "Method not allowed" });
@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 	}
 
 	// Check if the user already exists
-	const existingUser = await prisma.user.findUnique({
+	const existingUser = await prisma.User.findUnique({
 		where: { email },
 	});
 	if (existingUser) {
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
 	}
 
 	// Create a new user
-	const user = await prisma.user.create({
+	const user = await prisma.User.create({
 		data: {
 			email,
 			password: await hashPassword(password), // In a real application, ensure to hash the password before storing it
@@ -29,5 +29,8 @@ export default async function handler(req, res) {
 			email: true,
 		},
 	});
+
+	//TODO: Generate a token for the newly created user.
+
 	res.status(200).json(user);
 }
