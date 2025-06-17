@@ -29,10 +29,12 @@ export async function createToken(email, res) {
 	res.setHeader("Set-Cookie", [
 		serialize("accessToken", accessToken, {
 			httpOnly: true,
-			maxAge: 60 * 60 * 24,
+			path: "/", // Allows me to access from anywhere, no longer specific to an endpoint
+			maxAge: 60 * 10,
 		}),
 		serialize("refreshToken", refreshToken, {
 			httpOnly: true,
+			path: "/",
 			maxAge: 60 * 60 * 24,
 		}),
 	]);
@@ -51,4 +53,32 @@ export async function validToken(token) {
 	let cookies = cookie.parse(req.headers.cookie || "");
 }
 
-export async function deleteTokens(token) {}
+//Overwrite the existing tokens with one that expires in 0
+export async function expireTokens(res) {
+	let expiredAccessToken = jwt.sign(
+		{
+			data: { user: "" },
+		},
+		process.env.SECRET_KEY,
+		{ expiresIn: 0 }
+	);
+	let expiredRefreshToken = jwt.sign(
+		{
+			data: { user: "" },
+		},
+		process.env.REFRESH_SECRET_KEY,
+		{ expiresIn: 0 }
+	);
+	res.setHeader("Set-Cookie", [
+		serialize("accessToken", expiredAccessToken, {
+			httpOnly: true,
+			path: "/", // Allows me to access from anywhere, no longer specific to an endpoint
+			maxAge: 0,
+		}),
+		serialize("refreshToken", expiredRefreshToken, {
+			httpOnly: true,
+			path: "/",
+			maxAge: 0,
+		}),
+	]);
+}
