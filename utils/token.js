@@ -50,7 +50,7 @@ export async function createToken(email, res) {
 // if still valid give a new access token (leave refresh as is). return token_string
 // if expired: return empty string
 export async function validToken(token) {
-	let cookies = cookie.parse(req.headers.cookie || "");
+	let cookies = parse(req.headers.cookie || "");
 }
 
 //Overwrite the existing tokens with one that expires in 0
