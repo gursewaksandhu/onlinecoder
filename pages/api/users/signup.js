@@ -31,9 +31,7 @@ export default async function handler(req, res) {
 		},
 	});
 
-	//TODO: Generate a token for the newly created user.
 	let token = await createToken(email, res);
-	console.log(token);
 
 	res.status(200).json(user);
 }
