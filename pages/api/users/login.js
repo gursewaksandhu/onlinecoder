@@ -1,5 +1,6 @@
 import prisma from "@/utils/db";
 import { comparePassword } from "@/utils/auth";
+import { createToken } from "@/utils/token";
 
 export default async function handler(req, res) {
 	if (req.method !== "POST") {
@@ -14,7 +15,7 @@ export default async function handler(req, res) {
 
 	//Check if email exists as a user
 	// Retrieve hashed password
-	const hash = prisma.user.findUnique({
+	const hash = await prisma.user.findUnique({
 		where: {
 			email: email,
 		},
@@ -24,7 +25,7 @@ export default async function handler(req, res) {
 	});
 
 	if (hash) {
-		if (await comparePassword(password, hash)) {
+		if (await comparePassword(password, hash.password)) {
 			// calls function to make and store the token
 		} else {
 			return res.status(400).json("Incorrect Password");

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Auth API Tester</title>
+</head>
+<body>
+  <h1>Test Auth Endpoints</h1>
+
+  <p id="loginStatus">Not logged in</p>
+
+  <section>
+    <h2>Signup</h2>
+    <form id="signupForm">
+      <label>Email: <input type="email" name="email" required /></label><br />
+      <label>Password: <input type="password" name="password" required /></label><br />
+      <button type="submit">Signup</button>
+    </form>
+    <pre id="signupResult"></pre>
+  </section>
+
+  <section>
+    <h2>Login</h2>
+    <form id="loginForm">
+      <label>Email: <input type="email" name="email" required /></label><br />
+      <label>Password: <input type="password" name="password" required /></label><br />
+      <button type="submit">Login</button>
+    </form>
+    <pre id="loginResult"></pre>
+  </section>
+
+  <section>
+    <h2>Logout</h2>
+    <button id="logoutBtn">Logout</button>
+    <pre id="logoutResult"></pre>
+  </section>
+
+  <script>
+    // Updates the login status message
+    function updateLoginStatus(email) {
+      const statusEl = document.getElementById('loginStatus');
+      if (email) {
+        statusEl.textContent = `Logged in as: ${email}`;
+      } else {
+        statusEl.textContent = 'Not logged in';
+      }
+    }
+
+    async function postData(url = '', data = {}) {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        credentials: 'include' // for cookies
+      });
+      const json = await res.json();
+      return { status: res.status, body: json };
+    }
+
+    // Handle Signup
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const email = formData.get('email');
+      const password = formData.get('password');
+
+      const result = await postData('/api/users/signup', { email, password });
+      document.getElementById('signupResult').textContent = JSON.stringify(result, null, 2);
+
+      if (result.status === 200 && result.body.data?.email) {
+        updateLoginStatus(result.body.data.email);
+      }
+    });
+
+    // Handle Login
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const email = formData.get('email');
+      const password = formData.get('password');
+
+      const result = await postData('/api/users/login', { email, password });
+      document.getElementById('loginResult').textContent = JSON.stringify(result, null, 2);
+
+      if (result.status === 200 && result.body.data?.email) {
+        updateLoginStatus(result.body.data.email);
+      }
+    });
+
+    // Handle Logout
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      const res = await fetch('/api/users/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      const json = await res.json();
+      document.getElementById('logoutResult').textContent = JSON.stringify({ status: res.status, body: json }, null, 2);
+
+      if (res.status === 200) {
+        updateLoginStatus(null);
+      }
+    });
+
+    // Optional: On page load, you might want to check if user is logged in by calling a user info endpoint.
+    // For now, assume not logged in.
+    updateLoginStatus(null);
+  </script>
+</body>
+</html>

@@ -7,6 +7,12 @@ import jwt from "jsonwebtoken";
 
 import { serialize, parse } from "cookie";
 
+/** Used to create and store tokens given an login email
+ *
+ * @param {*} email
+ * @param {*} res
+ * @returns {string, string} accessToken and refreshToken
+ */
 export async function createToken(email, res) {
 	let accessToken = jwt.sign(
 		{
