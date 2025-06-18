@@ -34,4 +34,8 @@ export default async function handler(req, res) {
 	}
 
 	//Create Tokens if valid login
+	let token = await createToken(email, res);
+	return res
+		.status(200)
+		.json({ data: { email: email }, message: "User Successfully Logged In." });
 }

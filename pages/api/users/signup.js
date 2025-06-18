@@ -33,5 +33,7 @@ export default async function handler(req, res) {
 
 	let token = await createToken(email, res);
 
-	res.status(200).json(user);
+	return res
+		.status(200)
+		.json({ data: user, message: "Successfully Signed Up." });
 }
