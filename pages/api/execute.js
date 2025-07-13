@@ -26,6 +26,11 @@ function languageRunSyntax(language) {
 			return undefined;
 	}
 }
+/**
+ * Creates the temporary file that we will write the code to
+ * @param {String} language
+ * @returns {{directory: String, file: String}} // path to folder and path to file
+ */
 async function createFilePath(language) {
 	const directory = await mkdtemp(join(tmpdir(), "temp-"));
 	return {
@@ -34,6 +39,11 @@ async function createFilePath(language) {
 	};
 }
 
+/**
+ * Writes code to the given file path
+ * @param {String} filePath
+ * @param {String} code
+ */
 async function writeToFile(filePath, code) {
 	try {
 		await writeFile(filePath, code);
@@ -43,6 +53,10 @@ async function writeToFile(filePath, code) {
 	}
 }
 
+/**
+ * Deletes the Temporary directory and file we wrote the code to
+ * @param {String} directory
+ */
 async function deleteDirectory(directory) {
 	try {
 		await rm(directory, { recursive: true, force: true });
@@ -52,8 +66,15 @@ async function deleteDirectory(directory) {
 	}
 }
 
+/**
+ * Executes the code in the file given by pathMap
+ * @param {{folder: String, file: String}} pathMap
+ * @returns {{stdout: String, stderr: String, error: String}}
+ */
+
 async function execute(pathMap) {
 	const TIMEOUT = 5000;
+	//HARDCODED TO PYTHON FOR NOW
 	const dockerCommand = `docker run --rm --cpus=0.25 --memory=32m --read-only --network=none -v "${pathMap.folder}:/app" python:3.11-alpine python3 /app/code.py`;
 
 	let output = {
@@ -76,6 +97,12 @@ async function execute(pathMap) {
 	return output;
 }
 
+/**
+ * Runs all necessary functions to run code given a language and code
+ * @param {String} language
+ * @param {String} code
+ * @returns {{stdout: String, stderr: String, error: String}}
+ */
 async function codeRunner(language, code) {
 	try {
 		const pathMap = await createFilePath(language);
@@ -88,6 +115,7 @@ async function codeRunner(language, code) {
 	}
 }
 
+// handler function for the API route. pages/api/execute
 export default async function handler(req, res) {
 	if (req.method !== "POST") {
 		res.status(405).send("Method Not Allowed");
