@@ -68,9 +68,9 @@ async function execute(pathMap) {
 		output.stderr = stderr;
 	} catch (err) {
 		if (err.killed) {
-			output.error = "Execution timed out";
+			output.stderr = "Execution timed out";
 		} else {
-			output.error = `Execution failed: ${err.message}`;
+			output.stderr = err.stderr;
 		}
 	}
 	return output;
