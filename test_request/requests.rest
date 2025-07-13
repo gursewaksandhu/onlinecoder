@@ -5,3 +5,50 @@ Content-Type: application/json
     "email": "example@example.com",
     "password": "password"
 }
+
+### 1. Valid Python code
+POST http://localhost:3000/api/execute
+Content-Type: application/json
+
+{
+  "language": "python",
+  "code": "print('Hello, world!')"
+}
+
+### 2. Python syntax error
+POST http://localhost:3000/api/execute
+Content-Type: application/json
+
+{
+  "language": "python",
+  "code": "print('Missing paren'"
+}
+
+### 3. Missing `language` field
+POST http://localhost:3000/api/execute
+Content-Type: application/json
+
+{
+  "code": "print('This should fail')"
+}
+
+### 4. Unsupported language (Ruby)
+POST http://localhost:3000/api/execute
+Content-Type: application/json
+
+{
+  "language": "ruby",
+  "code": "puts 'Hello'"
+}
+
+### 5. Valid Python code using `math` module
+POST http://localhost:3000/api/execute
+Content-Type: application/json
+
+{
+  "language": "python",
+  "code": "import math\nprint(math.sqrt(16))"
+}
+
+### 6. Non-POST request (should return 405)
+GET http://localhost:3000/api/execute
